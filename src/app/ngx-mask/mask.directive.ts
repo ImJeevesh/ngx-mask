@@ -123,7 +123,24 @@ export class MaskDirective implements ControlValueAccessor {
                 ? 0
                 : caretShift
         );
+        this.performDelayedSelectionUpdate(el, e, this._position, position, caretShift);
         this._position = null;
+    }
+
+    performDelayedSelectionUpdate(el: HTMLInputElement, e: KeyboardEvent, _position: number | null, position: number, caretShift: number) {
+        var operation = () => {
+            el.selectionStart = el.selectionEnd = _position !== null
+                ? _position
+                : position + (
+                // tslint:disable-next-line
+                (e as any).inputType === 'deleteContentBackward'
+                    ? 0
+                    : caretShift
+            );
+        };
+        setTimeout(function() {
+            operation();
+        }, 10);
     }
 
     @HostListener('blur')
